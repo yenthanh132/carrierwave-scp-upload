@@ -1,6 +1,6 @@
 # CarrierWave SCP Upload
 
-Create the SCP storage alternative to upload files using [CarrierWave](https://github.com/jnicklas/carrierwave/)
+Custom upload plugin for [CarrierWave](https://github.com/jnicklas/carrierwave/) using SCP method
 
 ## Gem
 
