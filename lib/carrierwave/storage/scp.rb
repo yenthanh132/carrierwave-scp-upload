@@ -41,8 +41,37 @@ module CarrierWave
           end
         end
 
+        def store(file)
+          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |session|
+            dir = path.split('/')
+            dir.delete(dir[-1])
+            dir = dir.join('/')
+            session.exec! "mkdir -p #{@uploader.scp_folder}/#{dir}"
+            session.scp.upload! file.path, "#{@uploader.scp_folder}/#{path}", :recursive => true
+          end
+        end
+
+        def url
+          "#{@uploader.scp_url}/#{path}"
+        end
+
+        def exists?
+          size ? true : false
+        end
+
+        def content_type
+          @content_type || file.content_type
+        end
+
+        def content_type=(new_content_type)
+          @content_type = new_content_type
+        end
+
         def delete
-            #TODO implement this function to delete old file
+          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |session|
+            session.exec! "rm #{@uploader.scp_folder}/#{path}"
+          end
+        rescue
         end
       private
 
