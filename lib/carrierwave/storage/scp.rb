@@ -41,10 +41,6 @@ module CarrierWave
           end
         end
 
-        def url
-          "#{@uploader.scp_url}/#{path}"
-        end
-
         def exists?
           size ? true : false
         end
