@@ -41,16 +41,6 @@ module CarrierWave
           end
         end
 
-        def store(file)
-          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |session|
-            dir = path.split('/')
-            dir.delete(dir[-1])
-            dir = dir.join('/')
-            session.exec! "mkdir -p #{@uploader.scp_folder}/#{dir}"
-            session.scp.upload! file.path, "#{@uploader.scp_folder}/#{path}", :recursive => true
-          end
-        end
-
         def url
           "#{@uploader.scp_url}/#{path}"
         end
