@@ -32,13 +32,11 @@ module CarrierWave
         end
 
         def store(new_file)
-          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |session|
-            new_dir = path.split('/')
-            new_dir.delete(new_dir[-1])
-            new_dir = new_dir.join('/')
-            session.exec! "mkdir -p #{@uploader.scp_folder}/#{new_dir}"
-            session.scp.upload! new_file.path, "#{@uploader.scp_folder}/#{path}", :recursive => true
-          end
+          new_dir = path.split('/')
+          new_dir.delete(new_dir[-1])
+          new_dir = new_dir.join('/')
+          `ssh #{@uploader.scp_user}@#{@uploader.scp_host} 'mkdir -p #{@uploader.scp_folder}/#{new_dir}'`
+          `scp #{new_file.path} #{@uploader.scp_user}@#{@uploader.scp_host}:#{@uploader.scp_folder}/#{path}`
         end
 
         def exists?
@@ -54,9 +52,7 @@ module CarrierWave
         end
 
         def delete
-          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |session|
-            session.exec! "rm #{@uploader.scp_folder}/#{path}"
-          end
+          `ssh #{@uploader.scp_user}@#{@uploader.scp_host} 'rm #{@uploader.scp_folder}/#{path}'`
         rescue
         end
       private
@@ -67,7 +63,6 @@ module CarrierWave
             remote_file = session.scp.download!("#{@uploader.scp_folder}/#{path}", nil)
           end
           remote_file
-          #@file ||= open("scp://#{@uploader.scp_user}:#{@uploader.scp_options[:password]}@#{@uploader.scp_host}#{@uploader.scp_folder}/#{path}", options)
         end
 
       end #end File

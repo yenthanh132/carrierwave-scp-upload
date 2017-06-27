@@ -1,7 +1,7 @@
 # CarrierWave SCP Upload
 
 Custom upload plugin for [CarrierWave](https://github.com/jnicklas/carrierwave/) using SCP method
-
+NOTE that the workers server need connection permission to the storage server using private key.
 ## Gem
 
     gem install carrierwave-scp-upload
