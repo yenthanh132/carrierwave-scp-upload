@@ -35,8 +35,13 @@ module CarrierWave
           new_dir = path.split('/')
           new_dir.delete(new_dir[-1])
           new_dir = new_dir.join('/')
-          `ssh #{@uploader.scp_user}@#{@uploader.scp_host} 'mkdir -p #{@uploader.scp_folder}/#{new_dir}'`
-          `scp #{new_file.path} #{@uploader.scp_user}@#{@uploader.scp_host}:#{@uploader.scp_folder}/#{path}`
+          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |ssh|
+            ssh.exec "mkdir -p #{@uploader.scp_folder}/#{new_dir}"
+          end
+
+          Net::SCP.upload!(@uploader.scp_host, @uploader.scp_user, new_file.path,
+                           "#{@uploader.scp_folder}/#{path}",
+                           :ssh => @uploader.scp_options, :recursive => true)
         end
 
         def exists?
@@ -52,8 +57,9 @@ module CarrierWave
         end
 
         def delete
-          `ssh #{@uploader.scp_user}@#{@uploader.scp_host} 'rm #{@uploader.scp_folder}/#{path}'`
-        rescue
+          Net::SSH.start(@uploader.scp_host, @uploader.scp_user, @uploader.scp_options) do |ssh|
+            ssh.exec "rm #{@uploader.scp_folder}/#{path}"
+          end
         end
       private
 
